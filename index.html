@@ -577,10 +577,11 @@ async function startCall(kind){
   if(!navigator.mediaDevices?.getUserMedia||!window.RTCPeerConnection){alert("Panggilan belum didukung browser ini. Gunakan Chrome terbaru melalui HTTPS.");return;}
   if(!callChannel||!callChannelReady){alert("Koneksi panggilan belum siap. Tunggu sebentar lalu coba lagi.");return;}
   const presence=chatPresenceChannel?.presenceState?.()||{};
-  const target=Object.values(presence).flat().find(x=>x?.user_id&&x.user_id!==chatSession.user.id&&x.call_ready===true);
+  // Jangan wajibkan call_ready dari perangkat tujuan: APK versi lama mungkin
+  // belum mengirim properti itu meskipun sudah online dan channel panggilannya aktif.
+  const target=Object.values(presence).flat().find(x=>x?.user_id&&x.user_id!==chatSession.user.id);
   if(!target){
-    const anyOther=Object.values(presence).flat().some(x=>x?.user_id&&x.user_id!==chatSession.user.id);
-    alert(anyOther?"Pengguna lain sedang online, tetapi channel panggilannya belum siap. Minta pengguna masuk ulang ke chat.":"Pengguna lain sedang offline. Panggilan hanya dapat dimulai saat pengguna lain online.");
+    alert("Pengguna lain sedang offline. Panggilan hanya dapat dimulai saat pengguna lain online.");
     return;
   }
   callState={
