@@ -336,10 +336,27 @@ function updateSecretChatViewport(){const vv=window.visualViewport;const h=vv?vv
 if(window.visualViewport){window.visualViewport.addEventListener('resize',updateSecretChatViewport);window.visualViewport.addEventListener('scroll',updateSecretChatViewport);}window.addEventListener('resize',updateSecretChatViewport);
 $('chatInput').addEventListener('focus',()=>{updateSecretChatViewport();[120,300,500].forEach(delay=>setTimeout(updateSecretChatViewport,delay));});$('chatInput').addEventListener('blur',()=>setTimeout(updateSecretChatViewport,100));
 /* PANGGILAN SUARA & VIDEO WEBRTC MELALUI SUPABASE REALTIME */
+// ICE servers D'mistik: STUN untuk koneksi langsung dan TURN sebagai relay cadangan.
+// Kredensial Open Relay di bawah mengikuti konfigurasi contoh publik Metered;
+// gunakan kredensial TURN milik D'mistik sendiri untuk pemakaian produksi.
 const rtcConfig={
   iceServers:[
-    {urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}
-  ]
+    {urls:[
+      "stun:stun.l.google.com:19302",
+      "stun:stun1.l.google.com:19302",
+      "stun:openrelay.metered.ca:80"
+    ]},
+    {
+      urls:[
+        "turn:openrelay.metered.ca:80",
+        "turn:openrelay.metered.ca:443",
+        "turn:openrelay.metered.ca:443?transport=tcp"
+      ],
+      username:"openrelayproject",
+      credential:"openrelayproject"
+    }
+  ],
+  iceCandidatePoolSize:10
 };
 
 function callStatus(text){$("callStatus").textContent=text;}
